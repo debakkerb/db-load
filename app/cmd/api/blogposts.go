@@ -18,7 +18,6 @@ package main
 
 import (
 	"db-load/internal/data"
-	"fmt"
 	"net/http"
 )
 
@@ -54,6 +53,15 @@ func (app *application) createBlogPostHandler(w http.ResponseWriter, r *http.Req
 	}
 }
 
-func (app *application) showBlogPostsHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Show all blogposts")
+func (app *application) listBlogpostsHandler(w http.ResponseWriter, r *http.Request) {
+	blogposts, err := app.models.BlogPosts.GetAll()
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"blogposts": blogposts}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
 }
