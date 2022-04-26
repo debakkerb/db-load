@@ -74,7 +74,10 @@ spec:
             - name: MYSQL_DATABASE
               value: blog
             - name: MYSQL_USER
-              value: bloguser
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: mysql-db-credentials
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:

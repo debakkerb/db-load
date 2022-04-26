@@ -56,7 +56,6 @@ func main() {
 
 	flag.IntVar(&cfg.port, "port", 4000, "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
-	flag.StringVar(&cfg.db.dsn, "db-dsn", "", "MySQL DSN")
 	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "Mysql max open connections")
 	flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", 25, "mysql max idle connections")
 	flag.StringVar(&cfg.db.maxIdleTime, "db-max-idle-time", "15m", "Mysql max connection idle time")
@@ -71,7 +70,14 @@ func main() {
 		os.Exit(0)
 	}
 
-	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
+
+	dsn, err := buildDsn()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	cfg.db.dsn = dsn
 
 	db, err := openDB(cfg)
 	if err != nil {
@@ -98,7 +104,19 @@ func main() {
 	logger.Fatal(err)
 }
 
+func buildDsn() (string, error) {
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	fullDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
+	return fullDsn, nil
+}
+
 func openDB(cfg config) (*sql.DB, error) {
+	fmt.Printf("DSN: %s\n", cfg.db.dsn)
 	db, err := sql.Open("mysql", cfg.db.dsn)
 	if err != nil {
 		return nil, err
