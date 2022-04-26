@@ -14,3 +14,42 @@
 
 import random
 from locust import HttpUser, TaskSet, between
+
+def get_headers():
+    """ Generate HTTP headers """
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+
+def get_api_payload():
+    """ Generate Request Body """
+    payload = {
+
+    }
+    return payload
+
+
+class LocustClient(FastHttpUser):
+    host = ""
+    wait_time = constant(0)
+
+    def __init__(self, environment):
+       """ Constructor """
+       super().__init__(environment)
+
+    def on_start(self):
+        """ on_start is called before any task is scheduled. """
+        pass
+
+    def on_stop(self):
+        """ on_stop is called when TaskSet is stopping. """
+        pass
+
+    @task
+    def test_blogpost_service(self):
+        """ This method contains all the APIs that needs to be load tested for a service. """
+        headers = get_headers()
+
+        try:
+            api_payload = json.dumps(get_api_payload())
