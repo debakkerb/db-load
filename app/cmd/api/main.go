@@ -67,6 +67,7 @@ func main() {
 
 	if *displayVersion {
 		fmt.Printf("Version:\t%s\n", version)
+		fmt.Printf("Build time:\t%s\n", buildTime)
 		os.Exit(0)
 	}
 
