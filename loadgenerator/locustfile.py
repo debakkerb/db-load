@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BODY='{"title":"Blog Title","intro":"introduction","content":"content"}'
-curl -i -d "$BODY" http://34.79.15.143/v1/blogposts
+import random
+from locust import HttpUser, TaskSet, between
