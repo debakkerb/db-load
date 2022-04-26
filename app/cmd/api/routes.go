@@ -29,7 +29,7 @@ func (app *application) routes() *httprouter.Router {
 
 	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
 	router.HandlerFunc(http.MethodPost, "/v1/blogposts", app.createBlogPostHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/blogposts", app.showBlogPostsHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/blogposts", app.listBlogpostsHandler)
 
 	return router
 }
