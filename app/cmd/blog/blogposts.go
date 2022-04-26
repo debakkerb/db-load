@@ -40,13 +40,14 @@ func (app *application) createBlogPostHandler(w http.ResponseWriter, r *http.Req
 		Content: input.Content,
 	}
 
-	err = app.models.BlogPosts.Insert(blogpost)
+	id, err := app.models.BlogPosts.Insert(blogpost)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
 
 	headers := make(http.Header)
+	blogpost.ID = id
 	err = app.writeJSON(w, http.StatusCreated, envelope{"blogpost": blogpost}, headers)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)

@@ -112,11 +112,11 @@ func buildDsn() (string, error) {
 	dbName := os.Getenv("DB_NAME")
 
 	fullDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
+
 	return fullDsn, nil
 }
 
 func openDB(cfg config) (*sql.DB, error) {
-	fmt.Printf("DSN: %s\n", cfg.db.dsn)
 	db, err := sql.Open("mysql", cfg.db.dsn)
 	if err != nil {
 		return nil, err

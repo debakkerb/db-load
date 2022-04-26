@@ -48,13 +48,19 @@ spec:
         - name: blog
           image: europe-west1-docker.pkg.dev/bdb-container-shop-dev-6bbf/container-registry-dev/blog:latest
           imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /v1/healthcheck
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 5
           env:
             - name: DB_HOST
               value: mysql
             - name: DB_PORT
               value: "3306"
             - name: DB_NAME
-              value: blogposts
+              value: blog
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:

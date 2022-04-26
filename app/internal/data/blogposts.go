@@ -34,14 +34,22 @@ type BlogPostModel struct {
 	DB *sql.DB
 }
 
-func (b BlogPostModel) Insert(blogpost *BlogPost) error {
-	query := `
-		INSERT INTO blogposts(title, intro, content)
-		VALUES ($1, $2, $3) 
-		RETURNING id, created_at`
+func (b BlogPostModel) Insert(blogpost *BlogPost) (int64, error) {
+	stmt := `
+		INSERT INTO blogposts(title, intro, content, created)
+		VALUES (?, ?, ?, UTC_TIMESTAMP())`
 
-	args := []interface{}{blogpost.Title, blogpost.Intro, blogpost.Content}
-	return b.DB.QueryRow(query, args...).Scan(&blogpost.ID, &blogpost.CreatedAt)
+	result, err := b.DB.Exec(stmt, blogpost.Title, blogpost.Intro, blogpost.Content)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (b BlogPostModel) GetAll() ([]*BlogPost, error) {
