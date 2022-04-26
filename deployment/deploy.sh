@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-kubectl apply -f ./01_-_namespace.yaml
+kubectl create namespace blog
 
 ROOT_SQL_PASSWORD=$(openssl rand -base64 18)
 BLOG_SQL_PASSWORD=$(openssl rand -base64 18)
@@ -24,9 +24,25 @@ kubectl create secret -n blog generic mysql-db-credentials \
   --from-literal root-password=$ROOT_SQL_PASSWORD \
   --from-literal blog-password=$BLOG_SQL_PASSWORD
 
-kubectl apply -f ./02_-_mysql.yaml
+kubectl apply -f ./mysql.yaml
 
-kubectl apply -f ./03_-_blog.yaml
+MYSQL_STATUS=$(kubectl get pods --selector=app=mysql --output="jsonpath={.items[*].status.phase}")
+echo "MySQL Pod Status: ${MYSQL_STATUS}"
+
+while [ "${MYSQL_STATUS}" != "Running" ]; do
+  echo "MySQL not ready yet, status: ${MYSQL_STATUS}"
+  sleep 5
+  MYSQL_STATUS=$(kubectl get pods --selector=app=mysql --output="jsonpath={.items[*].status.phase}")
+done
+
+kubectl apply -f ./blog.yaml
+
+BLOG_STATUS=$(kubectl get pods --selector=app=blog --output="jsonpath={.items[*].status.phase}")
+
+while [ "${BLOG_STATUS}" != "Running" ]; do
+  sleep 5
+  BLOG_STATUS=$(kubectl get pods --selector=app=blog --output="jsonpath={.items[*].status.phase}")
+done
 
 BLOG_ADDRESS=$(kubectl -n blog get services blog --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
@@ -34,5 +50,5 @@ echo "Validating application deployment ..."
 curl http://${BLOG_ADDRESS}/v1/healthcheck
 
 BODY='{"title":"Blog Title","intro":"introduction","content":"content"}'
-curl -i -d "$BODY" http://34.79.15.143/v1/blogposts
+curl -i -d "$BODY" http://${BLOG_ADDRESS}/v1/blogposts
 
