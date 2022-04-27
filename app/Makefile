@@ -62,6 +62,7 @@ build/blog:
 build/docker:
 	@echo 'Building cmd/blog container ...'
 	docker build -t ${IMAGE_NAME}:${git_description} ./ && docker push ${IMAGE_NAME}:${git_description}
+	@echo 'New container image created, with tag ${git_description}'
 
 
 # ==================================================================================== #
