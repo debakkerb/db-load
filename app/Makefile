@@ -61,7 +61,7 @@ build/blog:
 .PHONY: build/docker
 build/docker:
 	@echo 'Building cmd/blog container ...'
-	docker build -t ${BLOG_IMAGE_NAME}:${git_description} ./ && docker push ${BLOG_IMAGE_NAME}:${git_description}
+	docker build --platform linux/amd64 -t ${BLOG_IMAGE_NAME}:${git_description} ./ && docker push ${BLOG_IMAGE_NAME}:${git_description}
 	@echo 'New container image created, with tag ${git_description}'
 
 
