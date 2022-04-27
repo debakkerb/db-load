@@ -61,3 +61,8 @@ curl http://${BLOG_ADDRESS}/v1/healthcheck
 BODY='{"title":"Blog Title","intro":"introduction","content":"content"}'
 curl -i -d "$BODY" http://${BLOG_ADDRESS}/v1/blogposts
 
+sed \
+  -e "s~#IMAGE_NAME~${IMAGE_NAME}~g" \
+  -e "s~#IMAGE_TAG~${IMAGE_TAG}~g" \
+  ./loadgenerator.yaml \
+  | kubectl apply -f -

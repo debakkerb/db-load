@@ -11,45 +11,74 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
+import logging
 import random
-from locust import HttpUser, TaskSet, between
+import time
+
+from locust import TaskSet, between
+
+__author__ = "Bjorn De Bakker"
+
+from locust.contrib.fasthttp import FastHttpUser
+
+blog_paragraph = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore " \
+                 "et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut " \
+                 "aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse " \
+                 "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in " \
+                 "culpa qui officia deserunt mollit anim id est laborum."
+
 
 def get_headers():
     """ Generate HTTP headers """
     headers = {
         "Content-Type": "application/json"
     }
+    return headers
 
 
 def get_api_payload():
     """ Generate Request Body """
-    payload = {
+    current_date_time = time.strftime("%d/%m/%Y %H:%M:%S")
+    post_title = f'Blog Post {current_date_time}'
 
+    post_intro = blog_paragraph
+
+    post_content = ""
+
+    for x in range(0, random.randint(1, 10)):
+        post_content += blog_paragraph
+        post_content += '\n\n'
+
+    payload = {
+        "title": post_title,
+        "intro": post_intro,
+        "content": post_content
     }
+
     return payload
 
 
-class LocustClient(FastHttpUser):
-    host = ""
-    wait_time = constant(0)
+def create_blog_post(l):
+    headers = get_headers()
+    try:
+        response = l.client.post('/v1/blogposts', data=get_api_payload(), headers=headers)
+        logging.info(f'Response: {response}')
+    except Exception as e:
+        logging.error(f'Exception while creating blogpost: {e}')
 
-    def __init__(self, environment):
-       """ Constructor """
-       super().__init__(environment)
+
+class UserBehavior(TaskSet):
 
     def on_start(self):
-        """ on_start is called before any task is scheduled. """
+        """ This method is called when a Task is being started. """
         pass
 
-    def on_stop(self):
-        """ on_stop is called when TaskSet is stopping. """
-        pass
+    tasks = {
+        create_blog_post: 1
+    }
 
-    @task
-    def test_blogpost_service(self):
-        """ This method contains all the APIs that needs to be load tested for a service. """
-        headers = get_headers()
 
-        try:
-            api_payload = json.dumps(get_api_payload())
+class WebsiteUser(FastHttpUser):
+    tasks = [UserBehavior]
+    wait_time = between(1, 10)
