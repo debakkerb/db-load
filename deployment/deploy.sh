@@ -15,6 +15,7 @@
 # limitations under the License.
 
 source ../app/.envrc
+source ../loadgenerator/.envrc
 
 IMAGE_TAG=$(git describe --always --dirty)
 
@@ -42,7 +43,7 @@ done
 echo "Deploying blog application with name ${IMAGE_NAME} and tag ${IMAGE_TAG}"
 
 sed \
-  -e "s~#IMAGE_NAME~${IMAGE_NAME}~g" \
+  -e "s~#IMAGE_NAME~${BLOG_IMAGE_NAME}~g" \
   -e "s~#IMAGE_TAG~${IMAGE_TAG}~g" \
   ./blog.yaml \
   | kubectl apply -f -
@@ -62,7 +63,7 @@ BODY='{"title":"Blog Title","intro":"introduction","content":"content"}'
 curl -i -d "$BODY" http://${BLOG_ADDRESS}/v1/blogposts
 
 sed \
-  -e "s~#IMAGE_NAME~${IMAGE_NAME}~g" \
+  -e "s~#IMAGE_NAME~${LOAD_GENERATOR_IMAGE_NAME}~g" \
   -e "s~#IMAGE_TAG~${IMAGE_TAG}~g" \
   ./loadgenerator.yaml \
   | kubectl apply -f -
