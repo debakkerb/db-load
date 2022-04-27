@@ -39,6 +39,8 @@ while [ "${MYSQL_STATUS}" != "Running" ]; do
   MYSQL_STATUS=$(kubectl get pods --selector=app=mysql --output="jsonpath={.items[*].status.phase}")
 done
 
+echo "Deploying blog application with name ${IMAGE_NAME} and tag ${IMAGE_TAG}"
+
 sed \
   -e "s~#IMAGE_NAME~${IMAGE_NAME}~g" \
   -e "s~#IMAGE_TAG~${IMAGE_TAG}~g" \
