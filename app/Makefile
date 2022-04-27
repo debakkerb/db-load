@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Include variables from .envrc file
-include .envrc
+include ./.envrc
 
 # ==================================================================================== #
 # HELPERS
@@ -46,16 +46,23 @@ db/mysql:
 # BUILD
 # ==================================================================================== #
 
-current_time = $(shell date --iso-8601=seconds)
-git_description = $(shell git describe --always --dirty --tags --long)
+current_time := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+git_description := $(shell git describe --always --dirty)
 linker_flags = '-s -X main.buildTime=${current_time} -X main.version=${git_description}'
 
 ## build/blog: build the cmd/blog application
 .PHONY: build/blog
 build/blog:
-	@echo 'Building cmd/api ...'
+	@echo 'Building cmd/blog ...'
 	go build -ldflags=${linker_flags} -o=./bin/blog ./cmd/blog
 	GOOS=linux GOARCH=amd64 go build -ldflags=${linker_flags} -o=./bin/linux_amd64/blog ./cmd/blog
+
+## build/docker: Build the cmd/blog application in a docker container
+.PHONY: build/docker
+build/docker:
+	@echo 'Building cmd/blog container ...'
+	docker build -t ${IMAGE_NAME}:${git_description} ./ && docker push ${IMAGE_NAME}:${git_description}
+
 
 # ==================================================================================== #
 # QUALITY CONTROL

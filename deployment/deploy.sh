@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+source ../app/.envrc
+
+IMAGE_TAG=$(git describe --always --dirty)
+
 kubectl create namespace blog
 
 ROOT_SQL_PASSWORD=$(openssl rand -base64 18)
@@ -35,16 +39,19 @@ while [ "${MYSQL_STATUS}" != "Running" ]; do
   MYSQL_STATUS=$(kubectl get pods --selector=app=mysql --output="jsonpath={.items[*].status.phase}")
 done
 
-kubectl apply -f ./blog.yaml
-
-BLOG_STATUS=$(kubectl get pods --selector=app=blog --output="jsonpath={.items[*].status.phase}")
-
-while [ "${BLOG_STATUS}" != "Running" ]; do
-  sleep 5
-  BLOG_STATUS=$(kubectl get pods --selector=app=blog --output="jsonpath={.items[*].status.phase}")
-done
+sed \
+  -e "s~#IMAGE_NAME~${IMAGE_NAME}~g" \
+  -e "s~#IMAGE_TAG~${IMAGE_TAG}~g" \
+  ./blog.yaml \
+  | kubectl apply -f -
 
 BLOG_ADDRESS=$(kubectl -n blog get services blog --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+while [ -z "${BLOG_ADDRESS}" ]; do
+  echo "Blog address not running: ${BLOG_ADDRESS}"
+  sleep 5
+  BLOG_ADDRESS=$(kubectl -n blog get services blog --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
+done
 
 echo "Validating application deployment ..."
 curl http://${BLOG_ADDRESS}/v1/healthcheck

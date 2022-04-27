@@ -45,7 +45,8 @@ spec:
     spec:
       containers:
         - name: blog
-          image: europe-west1-docker.pkg.dev/bdb-container-shop-dev-6bbf/container-registry-dev/blog:latest
+#          image: europe-west1-docker.pkg.dev/bdb-container-shop-dev-6bbf/container-registry-dev/blog:latest
+          image: europe-west1-docker.pkg.dev/bdb-container-shop-dev-6bbf/container-registry-dev/blog:2d24032-dirty
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
