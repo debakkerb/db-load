@@ -35,5 +35,5 @@ git_description := $(shell git describe --always --dirty)
 .PHONY: build/docker
 build/docker:
 	@echo 'Building load generator container ...'
-	docker build -t ${IMAGE_NAME}:${git_description} ./ && docker push ${IMAGE_NAME}:${git_description}
+	docker build -t ${LOAD_GENERATOR_IMAGE_NAME}:${git_description} ./ && docker push ${LOAD_GENERATOR_IMAGE_NAME}:${git_description}
 	@echo 'New container image created, with tag ${git_description}'
