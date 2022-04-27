@@ -13,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
 import logging
 import random
 import time
@@ -64,7 +64,7 @@ def get_api_payload():
 def create_blog_post(l):
     headers = get_headers()
     try:
-        response = l.client.post('/v1/blogposts', data=get_api_payload(), headers=headers)
+        response = l.client.post('/v1/blogposts', data=json.dumps(get_api_payload()), headers=headers)
         logging.info(f'Response: {response}')
     except Exception as e:
         logging.error(f'Exception while creating blogpost: {e}')
