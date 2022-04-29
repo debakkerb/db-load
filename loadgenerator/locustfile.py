@@ -64,9 +64,7 @@ def get_api_payload():
 def create_blog_post(l):
     headers = get_headers()
     try:
-        response = l.client.post('/v1/blogposts', data=json.dumps(get_api_payload()), headers=headers)
-        decoded_response = json.loads(response)
-        logging.info(f'Response: {decoded_response}')
+        l.client.post('/v1/blogposts', data=json.dumps(get_api_payload()), headers=headers)
     except Exception as e:
         logging.error(f'Exception while creating blogpost: {e}')
 
