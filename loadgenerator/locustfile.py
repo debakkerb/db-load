@@ -64,7 +64,8 @@ def get_api_payload():
 def create_blog_post(l):
     headers = get_headers()
     try:
-        l.client.post('/v1/blogposts', data=json.dumps(get_api_payload()), headers=headers)
+        api_response = l.client.post('/v1/blogposts', data=json.dumps(get_api_payload()), headers=headers)
+        print(f'Blog post created with ID: {api_response.json()["blogpost"]["id"]}')
     except Exception as e:
         logging.error(f'Exception while creating blogpost: {e}')
 
