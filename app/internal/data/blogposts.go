@@ -17,7 +17,6 @@ package data
  */
 
 import (
-	"context"
 	"database/sql"
 	"time"
 )
@@ -50,46 +49,4 @@ func (b BlogPostModel) Insert(blogpost *BlogPost) (int64, error) {
 	}
 
 	return id, nil
-}
-
-func (b BlogPostModel) GetAll() ([]*BlogPost, error) {
-	query := `
-		SELECT id, title, intro, content, created
-		FROM blogposts
-		ORDER BY id`
-
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	rows, err := b.DB.QueryContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	blogposts := []*BlogPost{}
-	for rows.Next() {
-		var blogpost BlogPost
-
-		err := rows.Scan(
-			&blogpost.ID,
-			&blogpost.Title,
-			&blogpost.Intro,
-			&blogpost.Content,
-			&blogpost.CreatedAt,
-		)
-
-		if err != nil {
-			return nil, err
-		}
-
-		blogposts = append(blogposts, &blogpost)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return blogposts, nil
 }
