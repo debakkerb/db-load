@@ -15,6 +15,7 @@
 # limitations under the License.
 import json
 import logging
+import os
 import random
 import time
 
@@ -29,6 +30,9 @@ blog_paragraph = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed d
                  "aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse " \
                  "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in " \
                  "culpa qui officia deserunt mollit anim id est laborum."
+
+number_of_paragraphs = os.getenv('NUM_PARAGRAPHS', '10')
+log_response = os.getenv('LOG_RESPONSE', 'false')
 
 
 def get_headers():
@@ -48,7 +52,7 @@ def get_api_payload():
 
     post_content = ""
 
-    for x in range(0, random.randint(1, 10)):
+    for x in range(0, random.randint(1, int(number_of_paragraphs))):
         post_content += blog_paragraph
         post_content += '\n\n'
 
@@ -61,15 +65,20 @@ def get_api_payload():
     return payload
 
 
-def create_blog_post(l):
+def create_blog_post(locust):
     headers = get_headers()
     try:
-        api_response = l.client.post('/v1/blogposts', data=json.dumps(get_api_payload()), headers=headers)
-        # blog_id = api_response.json()['blogpost']['id']
-        # blog_title = api_response.json()['blogpost']['title']
-        # print(f'Blog post created with ID {blog_id} and title {blog_title}')
+        api_response = locust.client.post('/v1/blogposts', data=json.dumps(get_api_payload()), headers=headers)
+        log_response(api_response)
     except Exception as e:
         logging.error(f'Exception while creating blogpost: {e}')
+
+
+def log_response(api_response):
+    if bool(log_response):
+        blog_id = api_response.json()['blogpost']['id']
+        blog_title = api_response.json()['blogpost']['title']
+        print(f'Blog post created with ID {blog_id} and title {blog_title}.')
 
 
 class UserBehavior(TaskSet):
