@@ -34,10 +34,14 @@ spec:
           image: #IMAGE_NAME:#IMAGE_TAG
           imagePullPolicy: Always
           env:
-          - name: FRONTEND_ADDR
-            value: "blog:80"
-          - name: USERS
-            value: "10"
+            - name: FRONTEND_ADDR
+              value: "blog:80"
+            - name: USERS
+              value: "10"
+            - name: NUM_PARAGRAPHS
+              value: "10"
+            - name: LOG_RESPONSE
+              value: "False"
           resources:
             requests:
               cpu: 300m

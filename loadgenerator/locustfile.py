@@ -19,7 +19,7 @@ import os
 import random
 import time
 
-from locust import TaskSet, between
+from locust import TaskSet, between, events
 
 __author__ = "Bjorn De Bakker"
 
@@ -31,8 +31,8 @@ blog_paragraph = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed d
                  "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in " \
                  "culpa qui officia deserunt mollit anim id est laborum."
 
-number_of_paragraphs = os.getenv('NUM_PARAGRAPHS', '10')
-log_response = os.getenv('LOG_RESPONSE', 'false')
+number_of_paragraphs = os.getenv('NUM_PARAGRAPHS', 10)
+log_response = os.getenv('LOG_RESPONSE', False)
 
 
 def get_headers():
@@ -79,6 +79,11 @@ def log_response(api_response):
         blog_id = api_response.json()['blogpost']['id']
         blog_title = api_response.json()['blogpost']['title']
         print(f'Blog post created with ID {blog_id} and title {blog_title}.')
+
+
+@events.init.add_listener
+def on_locust_init(environment, **kwargs):
+    print(f'Running tests with {number_of_paragraphs} paragraphs and logging enabled: {log_response}')
 
 
 class UserBehavior(TaskSet):

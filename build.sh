@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,28 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.8-slim AS base
+echo "Building and packaging the application ..."
 
-FROM base AS builder
+(cd app && make build/docker)
 
-RUN apt-get -qq update \
-    && apt-get install -y --no-install-recommends \
-    g++
+echo "Building and packaging the load generator ..."
 
-COPY requirements.txt .
+(cd loadgenerator && make build/docker)
 
-RUN pip install --prefix="/install" -r requirements.txt
+echo "Deploy everything on the cluster ..."
 
-FROM base
-
-WORKDIR /loadgen
-
-COPY --from=builder /install /usr/local
-
-COPY locustfile.py .
-
-ENV NUM_PARAGRAPHS=${NUM_PARAGRAPHS}
-
-ENV LOG_RESPONSE=${LOG_RESPONSE}
-
-ENTRYPOINT locust --host="http://${FRONTEND_ADDR}" --headless -u "${USERS:-10}" 2>&1
+(cd deployment && ./deploy.sh)
