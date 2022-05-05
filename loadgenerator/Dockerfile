@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Build
+
 FROM python:3.8-slim AS base
 
 FROM base AS builder
@@ -23,6 +25,8 @@ RUN apt-get -qq update \
 COPY requirements.txt .
 
 RUN pip install --prefix="/install" -r requirements.txt
+
+# Deploy
 
 FROM base
 

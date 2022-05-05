@@ -37,7 +37,7 @@ echo "MySQL Pod Status: ${MYSQL_STATUS}"
 while [ "${MYSQL_STATUS}" != "Running" ]; do
   echo "MySQL not ready yet, status: ${MYSQL_STATUS}"
   sleep 5
-  MYSQL_STATUS=$(kubectl get pods --selector=app=mysql --output="jsonpath={.items[*].status.phase}")
+  MYSQL_STATUS=$(kubectl -n blog get pods --selector=app=mysql --output="jsonpath={.items[*].status.phase}")
 done
 
 echo "Deploying blog application with name ${IMAGE_NAME} and tag ${IMAGE_TAG}"

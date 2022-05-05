@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-## BUILD
+## Build
 
 FROM golang:1.18.1-buster AS build
 
