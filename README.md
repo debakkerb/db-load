@@ -26,12 +26,31 @@ Create a file named `.envrc` in both the [loadgenerator](./loadgenerator) and [a
 
 They should point to the fully qualified name of the container image, including the full URL to the container registry.  For example, if you have an Artifact Registry in Europe West1, the container image name should look like this: `europe-west1-docker.pkg.dev/[PROJECT_ID]/[REGISTRY_NAME]/[CONTAINER_IMAGE_NAME]`.
 
+Both the application and the load generator use a multi-stage docker build to download the dependencies, build and package the application in a container image.
+
 **Deploy**
 
-Creating the container images and uploading them to your container registry should happen in three steps:
+Open a terminal in the root folder of this directory and run the following command:
+
+```shell
+# Deploy application resources
+./build.sh
+```
+
+This will run the following commands in the sub-directories:
 1. [app](./app): `make build/docker`
 2. [loadgenerator](./loadgenerator): `make build/docker`
 3. [deployment](./deployment): `./deploy.sh`
+
+The deployment creates the following resources on the cluster:
+- Namespace
+- Secret to store the MySQL root password, MySQL user password and user identity to authenticate with the MySQL server.
+- Service and Deployment for MySQL, incl. a `PersistentVolumeClaim`.
+- Service and Deployment for the application
+- Deployment for the load generator
+
+Technically, you don't need to expose the application on a Service of type `LoadBalancer`.  If you want to keep internal traffic, you can change the Service type to `ClusterIP`, which will only expose the application to Pods running in the cluster.
+
 
 **Important Note**
 
