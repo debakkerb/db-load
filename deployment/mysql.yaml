@@ -15,6 +15,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mysql-initdb-config
+  namespace: blog
 data:
   initdb.sql: |
     CREATE DATABASE IF NOT EXISTS blog;
@@ -25,9 +26,11 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-volumeclaim
+  namespace: blog
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: standard-rwo
   resources:
     requests:
       storage: 20Gi
@@ -36,6 +39,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mysql
+  namespace: blog
   labels:
     app: mysql
 spec:
@@ -49,6 +53,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
+  namespace: blog
   labels:
     app: mysql
 spec:
